@@ -1,58 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Form } from './Form/Form';
+import { Section } from './Section/Section';
+import { PhoneList } from './PhoneList/PhoneList';
+import { Filter } from './Filter/Filter';
+import { nanoid } from 'nanoid';
 
-import { Feedback } from './Feedback';
-
-const INITIAL_FEEDBACK = {
-  good: 0,
-  neutral: 0,
-  bad: 0,
-};
-
-export const App = () => {
-  const [feedback, setFeedback] = useState(INITIAL_FEEDBACK);
+export const App =() => {
   
-  const countFeedback = (e) => {
-    
-    setFeedback(prevState => ({
-      ...prevState,
-      [e.target.name]: Number.parseInt(prevState[e.target.name]) + 1,
-    }));
-  };
+  const [contacts, setContacts] = useState (() => JSON.parse(localStorage.getItem('contacts')) || [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+  ])
+  const [filter, setFilter] = useState('');
   
-
-  const countTotalFeedback = () => {
-    
-    const { good, neutral, bad } = feedback;
-    let total = 0;
-    
-    total = good + neutral + bad;
-    return total;
-  };
-
-  const countPositiveFeedbackPercentage = () => {
-    const { good, neutral, bad } = feedback;
-    let positive = 0;
-    positive = Math.round((good / (good + neutral + bad)) * 100)
-      ? Math.round((good / (good + neutral + bad)) * 100)
-      : 0;
-    return positive;
+  useEffect(() => {
+       localStorage.setItem('contacts', JSON.stringify(contacts))
+  }, [contacts])
+  
+  const addContact = newContact => {
+    const newContactEntity = {
+      id: nanoid(),
+      ...newContact,
+    };
+    contacts.find(contact => contact.name.toLowerCase() === newContactEntity.name.toLowerCase())
+      ? alert(`${newContactEntity.name} is already in contacts!`)
+      : setContacts(state => ([...state, newContactEntity]));
   };
 
-  const total = countTotalFeedback();
-  
-  return (
-    <>
-      <Feedback
-        options={{
-          good: feedback.good,
-          neutral: feedback.neutral,
-          bad: feedback.bad,
-        }}
-        
-        countFeedback={countFeedback}
-        total={total}
-        countPositiveFeedbackPercentage={countPositiveFeedbackPercentage}
-      />
-    </>
+  const handleFilterContactsByName = e => {
+    const { value } = e.target;
+    setFilter(value);
+  };
+
+  const deleteContact = id => {
+    setContacts(prevState => (prevState.filter(contact => contact.id !== id)));
+  };
+
+  const contactsByName = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
   );
-};
+
+  return (
+      <>
+        <Section title="Phonebook">
+          <Form addContact={addContact} />
+        </Section>
+        <Section title="Contacts">
+          <Filter
+            filter={filter}
+            onChange={handleFilterContactsByName}
+          />
+          <PhoneList contacts={contactsByName} onDelete={deleteContact} />
+        </Section>
+      </>
+    );
+  
+}
