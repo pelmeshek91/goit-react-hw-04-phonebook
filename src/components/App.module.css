@@ -1,0 +1,9 @@
+.phoneBook {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    color: rgb(65, 192, 243);
+}
