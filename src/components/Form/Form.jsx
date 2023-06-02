@@ -2,11 +2,10 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import s from './Form.module.css';
 
+const initialState = { name: '', number: '' };
+
 export const Form = ({ addContact }) => {
-  const [form, setForm] = useState({
-    name: '',
-    number: '',
-  });
+  const [form, setForm] = useState(initialState);
 
   const handleChange = ({ target: { name, value } }) => {
     setForm(prevForm => {
@@ -16,9 +15,8 @@ export const Form = ({ addContact }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    // const { name } = e.target;
     addContact(form);
-    // setForm({ ...form, [name]: (form[name] = '') });
+    setForm(initialState);
   };
 
   return (
