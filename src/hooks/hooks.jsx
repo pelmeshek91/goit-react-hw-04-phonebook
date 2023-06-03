@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 
 export default function useLocalStorage(key, defaultValue) {
   const [state, setState] = useState(() => {
-   return JSON.parse(localStorage.getItem(key)) ?? defaultValue;
+    const contacts = JSON.parse(localStorage.getItem(key));
+    return contacts?.length > 0 ? contacts : defaultValue;
   });
 
   useEffect(() => {
